@@ -17,7 +17,7 @@
 
 关于安装Capistrano 3有很多细节，请移步查看这篇[Capistrano 3安装](https://github.com/ShaoZeMing/capistrano3-doc/blob/master/doc/preInstalls.md)
 
-#  运行Capistrano
+#  部署Capistrano
 
 确定Capistrano 3 安装成功后执行：
 
@@ -51,6 +51,7 @@ $project_root/
 |
 |--tasks/
 ```
+![zbs001.jpg][1]
 
 **Capfile**是一个胶水文件，用来导入各种第三方库。这些第三方库往往已经定义好了各种任务，如数据库更新/回滚、远程控制台、等等等等。很多库也把任务整合进了部署/回滚流程（见下节）。
 
@@ -61,16 +62,16 @@ $project_root/
 **lib/capistrano/tasks**文件夹给你存放自定义任务的脚本。这些脚本必须以.rake结尾。
 
 
-#  快速部署 
+##  快速部署 
 
 *我们先来看看如何以最少的配置、最快的速度部署项目。*
 
-1. 进入项目根目录
+### 进入项目根目录
   
    ```
    $ cd /path/to/my_app
    ```
-2. 把项目加入SCM（如果已经做过了，这一步可以省略。这里用Git，你也可以用SVN）
+### 把项目加入SCM（如果已经做过了，这一步可以省略。这里用Git，你也可以用SVN）
  
    ```
    $ git init
@@ -79,12 +80,12 @@ $project_root/
    $ git remote add origin <remote repo url>
    $ git push origin master
    ```
-3. 把项目Capistrano化（如果已经做过了，直接跳过）
+### 把项目Capistrano化（如果已经做过了，直接跳过）
    
    ```
    $ cap install
    ```
-4. 修改`config/deploy.rb`里的这几行：
+### 修改`config/deploy.rb`里的这几行：
    
    ```
    set :application, 'my_app'  # my_app是你的项目名称，这决定部署的目录
@@ -92,7 +93,9 @@ $project_root/
    set :repo_url, '<remote repo url>'  # 你的remote仓库的url
    set :deploy_to, '/var/www/my_app'  # 默认部署到 /var/www/my_app目录，根据你的实际情况修改
    ```
-5. 修改 `config/deploy/staging.rb`注释掉下面这几行：
+   ![zbs002.jpg][2]
+
+### 修改 `config/deploy/staging.rb`注释掉下面这几行（默认是注释的）：
    
    ```
    # role :app, %w{admin@example.com}
@@ -103,14 +106,17 @@ $project_root/
    例：  
    server '123.456.0.89', user: 'root', roles: %w{web app db}, my_variable: :my_value
    ```
-6. 部署
+   ![zbs003.jpg][3]
+   
+### 部署
   
    ```
    $ cap staging deploy
    ```
    这一步可能会出现一些权限问题，请确保服务器端的部署目录的上级目录存在，并且你配置的用户对该目录有完全权限，并且它的上级、上上级……目录至少具有读和执行权限。通常/var/www是没有写权限的，运行命令`chmod -R 777 /var/www`,这里的`/var/www`指的是你文件配置的 `set :deploy_to，"***/***"`部署项目根目录。改完权限后再次尝试这一步即可。
+![zbs005.jpg][4]
 
-# 服务器端部署项目
+## 服务器端部署项目
 
 用Capistrano部署成功后，在服务器端会生成这样一个文件夹结构：
 
@@ -129,6 +135,7 @@ $deploy_path
 |
 |--current -> /xxxxxxxxx/
 ```
+![zbs006.jpg][5]
 
 简要介绍一下几个文件/文件夹的作用:
 
@@ -148,7 +155,7 @@ $deploy_path
 这里记录了你所有的部署记录。
 
 
-### 你直接将虚拟主机请求访问目录指定到current目录下，项目对应的入口目录，就可以直接访问了。
+#### 你直接将虚拟主机请求访问目录指定到current目录下，项目对应的入口目录，就可以直接访问了。
 
 
 # Capistrano 3基本概念
@@ -253,7 +260,7 @@ execute(‘echo Hello World’)
 execute函数的作用是在远端的命令行里执行给定的命令（这里是echo Hello World）。Execute会捕获stdout的输出，并以debug的log级别打印到本地控制台。
 Capistrano提供了很多很好用的函数，其中很多是从ssh-kit这个库借来的。下面简要列举几个常用的：
 
-  1. on
+1. on
      ```
      on server do
      # ...
@@ -264,35 +271,36 @@ Capistrano提供了很多很好用的函数，其中很多是从ssh-kit这个库
      end
      ```
      也可以像之前的例子一样指定角色，这里就不多说了。
-  2. with
+2. with
      ```
      with var1: ‘val1’, var2: ‘val2’ do
      # ...
      end
      ```
      在远端机器上添加临时的环境变量（这里是VAR1=val1 VAR2=val2，注意Capistrano会把变量名变成全大写），并执行do-end里的内容
-  3. within
+3. within
      ```
      within ‘/some/dir’ do（Windows用户可把它想象成快捷方式）
      # ..
      end
      ```
      在远端的指定文件夹里执行do-end里的内容。通常会用来跑服务器端的rake任务，因为rake任务通常需要在项目的根目录来跑。
-  4. execute
+4. execute
      `execute ‘some shell command’`
      在远端运行shell命令
-  5. rake
+5. rake
     `rake ‘some:rake:task’`
      在远端运行rake任务。通常会和within一起使用。
-  6. current_path
+6. current_path
      返回远端当前运行版本的路径（$deploy_path/current/）,类型是Pathname
 
-  7. release_path
+7. release_path
      返回当前部署中的版本在远端的路径（$deploy_path/releases/xxxxxxxx/）,类型是Pathname
-  8. deploy_path
+8. deploy_path
      返回部署目录（也就是你在config/deploy.rb里配置的deploy_to那一项）,类型是Pathname
-  9. releases_path
+9. releases_path
      返回远端保存所有发布版本的目录（$deploy_to/releases/）,类型是Pathname
+
 
 Rake说白了就是个Ruby的库，在Rake脚本里，所有Ruby语言的语法都适用。
 
@@ -321,7 +329,9 @@ after ‘tomcat:deploy’, ‘tomcat:restart’
 
 deploy.rb里还有很多东西可以配，包括使用的SCM（Git还是SVN），SCM的URL等。这些设置都很简单，你直接看这个文件里的注释就能了解的差不多了。实在不行找Google。你也可以通过这个文件设置一些远端的环境变量，不过这些环境变量都是临时的，部署完了就没了。而且这个文件同样不适合存放敏感信息。
 
-**比较重要的两个配置是** `linked_files`和`linked_dirs`。通常情况下，Capistrano每次部署会更新所有的文件和文件夹，但是有时候有些东西我并不想让它每次都更新，而是永远都用最早部署上去的那个版本的。比较重要的是app server的pid文件。由于这个文件保存了app server的pid（进程ID），而这个pid又关系到app server的重启，如果每次部署都更新这个文件，将导致服务器无法重启。我们可以把这个文件加入linked_files，或把它所在的文件夹整个加进linked_dirs。Capistrano会把linked_files和linked_dirs里的配置的文件/文件夹放进shared/，并在每次部署的版本里用symlink的方式链接进项目里，这就保证了每次部署这些文件/文件夹都不会被更新，但是在应用里还是一样去访问，不用调整访问路径。
+**比较重要的两个配置是** `linked_files`和`linked_dirs`。
+
+通常情况下，Capistrano每次部署会更新所有的文件和文件夹，但是有时候有些东西我并不想让它每次都更新，而是永远都用最早部署上去的那个版本的。比较重要的是app server的pid文件。由于这个文件保存了app server的pid（进程ID），而这个pid又关系到app server的重启，如果每次部署都更新这个文件，将导致服务器无法重启。我们可以把这个文件加入linked_files，或把它所在的文件夹整个加进linked_dirs。Capistrano会把linked_files和linked_dirs里的配置的文件/文件夹放进shared/，并在每次部署的版本里用symlink的方式链接进项目里，这就保证了每次部署这些文件/文件夹都不会被更新，但是在应用里还是一样去访问，不用调整访问路径。
 
 ## 关于Capistrano的环境变量
 
@@ -330,13 +340,21 @@ deploy.rb里还有很多东西可以配，包括使用的SCM（Git还是SVN）�
 ### 具体做法是：
 
 1. 打开服务器端的/etc/ssh/sshd_config文件（注意文件名里有个d），修改AcceptEnv这一项，添加你想要从本地获取的环境变量名，通常是以项目名称做前缀的环境变量名。重启服务器端的ssh服务。
-
 2. 打开本地的/etc/ssh/ssh_config文件（注意文件名里没有d），修改SendEnv这一项，把你想带上的环境变量名都加进去。
-
 3. 打开本地的包含环境变量的配置文件（通常是~/.bashrc，如果你用的是login shell，则~/.bash_login或~/.bash_profile也OK），把要传到服务器的环境变量都设进去。
-
 4. 用Capistrano部署
 
 这个方案的好处在于，所有的环境变量都只存在于开发机，就算生产环境的机器被攻破了，也不会泄露这些环境变量的值，除非黑客attach进你的Web App进程。这样我们就可以放心地在环境变量里保存敏感信息啦。
 
-这个方案的缺点在于它只能在当前SSH的TTY及其子进程里使用带过去的环境变量。对于PHP这类每个请求一个进程，而且不是从你当前的SSH的TTY fork出来的进程，这些环境变量是访问不到的。另外，如果你有crontab触发的后台定时任务，则在这些任务里也是访问不到这些环境变量的。对于这种情况，解决方案是：配置文件改个名字，在敏感信息的位置放个占位符，把它放进linked_files。然后通过SSH带环境变量的方法带上你的真实的敏感信息，在远端复制那个改过名的文件，用敏感信息替换掉占位符，并修改注意在远端修改该文件的权限。真实的配置文件也可以放进linked_files。这种方式的缺点在于一旦你的服务器被攻破，你的敏感信息暴露无疑。
+这个方案的缺点在于它只能在当前SSH的TTY及其子进程里使用带过去的环境变量。
+
+对于PHP这类每个请求一个进程，而且不是从你当前的SSH的TTY fork出来的进程，这些环境变量是访问不到的。
+另外，如果你有crontab触发的后台定时任务，则在这些任务里也是访问不到这些环境变量的。
+对于这种情况，解决方案是：配置文件改个名字，在敏感信息的位置放个占位符，把它放进linked_files。然后通过SSH带环境变量的方法带上你的真实的敏感信息，在远端复制那个改过名的文件，用敏感信息替换掉占位符，并修改注意在远端修改该文件的权限。真实的配置文件也可以放进linked_files。这种方式的缺点在于一旦你的服务器被攻破，你的敏感信息暴露无疑。
+
+
+  [1]: https://github.com/ShaoZeMing/capistrano3-doc/blob/master/img/zbs001.jpg
+  [2]: https://github.com/ShaoZeMing/capistrano3-doc/blob/master/img/zbs002.jpg
+  [3]: https://github.com/ShaoZeMing/capistrano3-doc/blob/master/img/zbs003.jpg
+  [4]: https://github.com/ShaoZeMing/capistrano3-doc/blob/master/img/zbs005.jpg
+  [5]: https://github.com/ShaoZeMing/capistrano3-doc/blob/master/img/zbs006.jpg
