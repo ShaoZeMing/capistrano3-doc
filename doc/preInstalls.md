@@ -78,8 +78,8 @@ Capistrano是一种通过ssh向多个服务器部署web应用的一种框架和�
 
 capistrano依赖zlib和openssl，安装ruby前需要将这两个软件包安装好，这样安装过程才会比较顺利。
 
-  [1]: https://github.com/ShaoZeMing/capistrano3-doc/tree/master/img74100548.jpg
-  [2]: http://blog.4d4k.com/usr/uploads/2017/02/2471742994.png
-  [3]: http://blog.4d4k.com/usr/uploads/2017/02/2134425200.jpg
+  [1]: https://github.com/ShaoZeMing/capistrano3-doc/blob/master/img/zan001.jpg
+  [2]: https://github.com/ShaoZeMing/capistrano3-doc/blob/master/img/zan002.png
+  [3]: https://github.com/ShaoZeMing/capistrano3-doc/blob/master/img/zan003.jpg
   [4]: http://capistranorb.com/documentation/getting-started/installation/
-  [5]: http://blog.4d4k.com/usr/uploads/2017/02/3324363127.jpg
+  [5]: https://github.com/ShaoZeMing/capistrano3-doc/blob/master/img/zan004.jpg
