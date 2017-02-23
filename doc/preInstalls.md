@@ -18,10 +18,10 @@ Capistrano是一种通过ssh向多个服务器部署web应用的一种框架和�
 ## Ubuntu 下安装ruby 和 Rubygem
 
 运行一条命令即可：
-
+```
 `sudo apt-get update`
-`sudo apt-get install ruby-full rubygems `
-
+`sudo apt-get install ruby-full rubygems`
+```
 ![zan001.jpg][1]
 
 由于我安装过了，提示我已近安装了当前Ubuntu最稳定的ruby2.3版本，满足ruby>2.0要求
