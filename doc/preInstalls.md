@@ -80,6 +80,6 @@ capistrano依赖zlib和openssl，安装ruby前需要将这两个软件包安装�
 
   [1]: https://github.com/ShaoZeMing/capistrano3-doc/blob/master/img/zan001.jpg
   [2]: https://github.com/ShaoZeMing/capistrano3-doc/blob/master/img/zan002.png
-  [3]: https://github.com/ShaoZeMing/capistrano3-doc/blob/master/img/zan003.jpg
+  [3]: https://github.com/ShaoZeMing/capistrano3-doc/blob/master/img/zan004.jpg
   [4]: http://capistranorb.com/documentation/getting-started/installation/
-  [5]: https://github.com/ShaoZeMing/capistrano3-doc/blob/master/img/zan004.jpg
+  [5]: https://github.com/ShaoZeMing/capistrano3-doc/blob/master/img/zan003.jpg
