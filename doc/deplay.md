@@ -1,29 +1,33 @@
-*如果你在服务器上部署过Web项目应用，你应该知道，很多时候并不是把源代码包放上服务器就了事的。你得修改配置，修改数据库结构，重启服务器，重启后台进程……人是很容易犯错的，步骤一多，就会记不住。如果你部署的是大型Web应用，几百台服务器各自负责不同的工作，那部署一次就能让你哭出来。有什么办法解决这个问题？自动化部署！计算机能够勤勤恳恳孜孜不倦地重复劳动，那为什么我们不把部署的任务交给它呢？于是乎，今天我就来讲讲怎么用Capistrano 3来实现自动化部署。*
+如果你在服务器上部署过Web项目应用，你应该知道，很多时候并不是把源代码包放上服务器就了事的。你得修改配置，修改数据库结构，重启服务器，重启后台进程……人是很容易犯错的，步骤一多，就会记不住。如果你部署的是大型Web应用，几百台服务器各自负责不同的工作，那部署一次就能让你哭出来。有什么办法解决这个问题？自动化部署！计算机能够勤勤恳恳孜孜不倦地重复劳动，那为什么我们不把部署的任务交给它呢？于是乎，今天我就来讲讲怎么用Capistrano 3来实现自动化部署。
 
-## 先决条件
+# 先决条件
 
-> Capistrano依赖于使用基于密钥（即无密码）身份验证的SSH连接到您的服务器。你需要这个工作，然后才能使用Capistrano.
-> 同样，您的服务器可能需要安装支持软件，然后才能执行部署。除了SSH之外，Capistrano本身没有任何要求，但您的应用程序可能需要数据库软件，像Apache或Nginx这样的Web服务器，以及Java，Ruby或PHP等语言运行库。这些服务器配置步骤不是由Capistrano完成的,需要你提前搭建好。
+- Capistrano依赖于使用基于密钥（即无密码）身份验证的SSH连接到您的服务器。你需要这个工作，然后才能使用Capistrano.
+- 同样，您的服务器可能需要安装支持软件，然后才能执行部署。除了SSH之外，Capistrano本身没有任何要求，但您的应用程序可能需要数据库软件，像Apache或Nginx这样的Web服务器，以及Java，Ruby或PHP等语言运行库。这些服务器配置步骤不是由Capistrano完成的,需要你提前搭建好。
 
-## 所需软件
->  1. Ruby >= 2.0 //官方要求，Capistrano 3 捆绑成了一个Ruby Gem。它需要Ruby 2.0或更高版本。
-（这安装指的是Capistrano的运行环境，并不是指你的服务器或Web项目是Ruby，你的项目应用部署目的地服务器也不必安装Capistrano和Ruby）
->  2. SSH Server（服务器端），采用公钥验证
->  3. SSH Client（开发机端） 
->  4. SCM（Source Controll Management，版本控制，推荐使用Git） 
->  5. 如果使用Git，建议申请一个git.oschina.net或github.com的帐号
+# 所需软件
 
-## 安装Capistrano 3
-关于安装Capistrano 3有很多细节，请移步查看这篇[Capistrano 3安装](https://gist.github.com/ShaoZeMing/6c65746e181bcfb62e655c2c29e9ba3c)<https://gist.github.com/ShaoZeMing/6c65746e181bcfb62e655c2c29e9ba3c>
+1. Ruby >= 2.0 (这安装指的是Capistrano的运行环境，并不是指你的服务器或Web项目必须，你的项目应用部署目的地服务器也不必安装Capistrano和Ruby）
+2. SSH Server（服务器端），采用公钥验证
+3. SSH Client（开发机端） 
+4. SCM（Git或SVN） 
+5. 如果使用Git，建议申请一个git.oschina.net或github.com的帐号
 
-## 确定Capistrano 3 安装成功后：
+# 安装Capistrano 3
+
+关于安装Capistrano 3有很多细节，请移步查看这篇[Capistrano 3安装](https://github.com/ShaoZeMing/capistrano3-doc/blob/master/doc/preInstalls.md)
+
+#  运行Capistrano
+
+确定Capistrano 3 安装成功后执行：
 
 ```
 $ cd $project_root 
 $ cap install  
 ```
-其中`$project_root`是你的项目的根。
-**注：如果你从来没用过UNIX/Linux，每行开头的那个$是不用你打的。它是命令行提示符，相当于Windows里的C:\>。中间的$xxx是变量，类似于Windows里的%xxx%。**
+其中`$project_root`是你的项目的根(开发端)。
+注：如果你从来没用过UNIX/Linux，每行开头的那个$是不用你打的。它是命令行提示符，相当于Windows里的C:\>。中间的$xxx是变量，类似于Windows里的%xxx%
+
 
 最后一条命令`cap install`会帮你在项目的根下创建下述文件/目录结构：
 
@@ -56,46 +60,59 @@ $project_root/
 
 **lib/capistrano/tasks**文件夹给你存放自定义任务的脚本。这些脚本必须以.rake结尾。
 
-##  快速上手 
+
+#  快速部署 
 
 *我们先来看看如何以最少的配置、最快的速度部署项目。*
 
 1. 进入项目根目录
-  `$ cd /path/to/my_app`
+  
+   ```
+   $ cd /path/to/my_app
+   ```
 2. 把项目加入SCM（如果已经做过了，这一步可以省略。这里用Git，你也可以用SVN）
-  ```
-  $ git init
-  $ git add --all .
-  $ git commit -m ‘Initial commit’
-  $ git remote add origin <remote repo url>
-  $ git push origin master
-  ```
+ 
+   ```
+   $ git init
+   $ git add --all .
+   $ git commit -m ‘Initial commit’
+   $ git remote add origin <remote repo url>
+   $ git push origin master
+   ```
 3. 把项目Capistrano化（如果已经做过了，直接跳过）
-  `$ cap install`
+   
+   ```
+   $ cap install
+   ```
 4. 修改`config/deploy.rb`里的这几行：
-  ```
-  set :application, 'my_app'  # my_app是你的项目名称，这决定部署的目录
-  set :scm, :git  # 如果你用SVN，把:git改成:svn就行
-  set :repo_url, '<remote repo url>'  # 你的remote仓库的url
-  set :deploy_to, '/var/www/my_app'  # 默认部署到 /var/www/my_app目录，根据你的实际情况修改
-  ```
-5. 修改 *config/deploy/staging.rb*：
-  注释掉下面这几行：
-  ```
-  # role :app, %w{admin@example.com}
-  # role :web, %w{admin@example.com}
-  # role :db, %w{admin@example.com}
-  根据实际服务器的IP/域名和用户名修改下面这一行：
-  server 'example.com', user: 'admin', roles: %w{web app db}, my_variable: :my_value
-  例：  
-  server '123.456.0.89', user: 'root', roles: %w{web app db}, my_variable: :my_value
-  ```
+   
+   ```
+   set :application, 'my_app'  # my_app是你的项目名称，这决定部署的目录
+   set :scm, :git  # 如果你用SVN，把:git改成:svn就行
+   set :repo_url, '<remote repo url>'  # 你的remote仓库的url
+   set :deploy_to, '/var/www/my_app'  # 默认部署到 /var/www/my_app目录，根据你的实际情况修改
+   ```
+5. 修改 `config/deploy/staging.rb`注释掉下面这几行：
+   
+   ```
+   # role :app, %w{admin@example.com}
+   # role :web, %w{admin@example.com}
+   # role :db, %w{admin@example.com}
+   根据实际服务器的IP/域名和用户名修改下面这一行：
+   server 'example.com', user: 'admin', roles: %w{web app db}, my_variable: :my_value
+   例：  
+   server '123.456.0.89', user: 'root', roles: %w{web app db}, my_variable: :my_value
+   ```
 6. 部署
-  `$ cap staging deploy` 
-  这一步可能会出现一些权限问题，请确保服务器端的部署目录的上级目录存在，并且你配置的用户对该目录有完全权限，并且它的上级、上上级……目录至少具有读和执行权限。通常/var/www是没有写权限的，你可以把它的权限改成drwxrwsrwt（3777）运行命令`chmod -R 777 /var/www`,这里的var/www指的是你文件配置的 set :deploy_to，‘***/***’。改完权 限后再次尝试这一步即可。
+  
+   ```
+   $ cap staging deploy
+   ```
+   这一步可能会出现一些权限问题，请确保服务器端的部署目录的上级目录存在，并且你配置的用户对该目录有完全权限，并且它的上级、上上级……目录至少具有读和执行权限。通常/var/www是没有写权限的，运行命令`chmod -R 777 /var/www`,这里的var/www指的是你文件配置的 `set :deploy_to，"***/***"`部署项目根目录。改完权限后再次尝试这一步即可。
 
-## 远端的文件夹结构
-用Capistrano部署后，在服务器端会生成这样一个文件夹结构：
+## 服务端文件夹
+
+用Capistrano部署成功后，在服务器端会生成这样一个文件夹结构：
 
 ```
 $deploy_path
@@ -125,7 +142,10 @@ $deploy_path
 5. `revisions.log`
 这里记录了你所有的部署记录。
 
+
+
 ## Capistrano 3基本概念
+
 Capistrano 3每次部署都会让服务器去SCM上拉取最新版本（注意不是本地版本，更不是本地尚未提交至SCM的文件），你可以通过下述指令开始部署过程：
 ```
 $ cd $project_root

@@ -85,7 +85,10 @@ cap -v
 
 # 总结
 
-capistrano依赖zlib和openssl，安装ruby前需要将这两个软件包安装好，这样安装过程才会比较顺利。
+Capistrano依赖zlib和openssl，安装ruby前需要将这两个软件包安装好，这样安装过程才会比较顺利。
+Capistrano依赖于使用基于密钥（即无密码）身份验证的SSH连接到您的服务器。你需要提前做这个工作，然后才能使用Capistrano.
+同样，您的服务器可能需要安装支持软件，然后才能执行部署。除了SSH之外，Capistrano本身没有任何要求，但您的应用程序可能需要数据库软件，像Apache或Nginx这样的Web服务器，以及Java，Ruby或PHP等语言运行库。这些服务器配置步骤不是由Capistrano完成的,需要你提前搭建好。
+
 
   [1]: https://github.com/ShaoZeMing/capistrano3-doc/blob/master/img/zan001.jpg
   [2]: https://github.com/ShaoZeMing/capistrano3-doc/blob/master/img/zan002.png
